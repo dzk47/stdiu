@@ -1,222 +1,330 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Açaí Prime</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-:root{
- --p:#4c1d95;--s:#6d28d9;--a:#16a34a;--bg:#f8fafc;--c:#fff
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui;background:var(--bg)}
-header{background:linear-gradient(135deg,var(--p),var(--s));color:#fff;padding:30px;text-align:center}
-nav button{margin:5px;padding:10px 18px;border:none;border-radius:999px;font-weight:700;cursor:pointer}
-section{max-width:900px;margin:auto;padding:20px}
-.card{background:var(--c);border-radius:18px;padding:20px;box-shadow:0 10px 25px rgba(0,0,0,.08);margin-bottom:20px}
-.hidden{display:none}
-.options{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
-.option{border:2px solid #e5e7eb;border-radius:12px;padding:12px;text-align:center;font-weight:700;cursor:pointer}
-.option.active{border-color:var(--p);background:#ede9fe}
-img{width:100%;border-radius:12px;margin-bottom:8px}
-.total{font-size:1.4rem;font-weight:900;color:var(--p)}
-.cta{width:100%;padding:16px;border:none;border-radius:999px;background:var(--a);color:#fff;font-weight:800;cursor:pointer}
-input,textarea{width:100%;padding:10px;margin:6px 0}
-</style>
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Açaí Delivery - Sistema Profissional</title>
+    <style>
+        /* DESIGN SYSTEM */
+        :root {
+            --primary: #4b0082; /* Roxo Açaí */
+            --primary-dark: #310055;
+            --accent: #ffcc00;
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --text: #333;
+            --gray: #666;
+            --radius: 12px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; }
+
+        /* HEADER */
+        header { background: var(--primary); color: white; padding: 20px; text-align: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; box-shadow: var(--shadow); }
+        header h1 { font-size: 24px; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* NAVEGAÇÃO / ABAS */
+        .tabs { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
+        .tab-btn { padding: 10px 20px; border: none; background: #ddd; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        /* CONTAINERS */
+        .container { max-width: 600px; margin: 0 auto; padding: 0 15px; }
+        .section-title { margin: 20px 0 10px; font-size: 18px; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 10px; }
+
+        /* CARDS */
+        .item-card { background: var(--card); border-radius: var(--radius); padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); transition: 0.2s; border: 1px solid transparent; }
+        .item-card:active { transform: scale(0.98); border-color: var(--primary); }
+        .item-info h3 { font-size: 16px; margin-bottom: 5px; }
+        .item-info p { font-size: 14px; color: var(--gray); }
+        .item-price { font-weight: bold; color: var(--primary); }
+
+        /* MODAL DE SELEÇÃO */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
+        .modal-content { background: white; width: 100%; max-width: 600px; border-top-left-radius: 25px; border-top-right-radius: 25px; padding: 25px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-btn { font-size: 24px; cursor: pointer; background: #eee; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
+
+        /* ACOMPANHAMENTOS */
+        .topping-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .topping-item input { transform: scale(1.5); accent-color: var(--primary); }
+        .limit-warn { background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: none; }
+
+        /* FOOTER / CARRINHO */
+        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px; box-shadow: 0 -4px 10px rgba(0,0,0,0.1); display: none; justify-content: space-between; align-items: center; z-index: 900; }
+        .btn-order { background: var(--primary); color: white; padding: 12px 25px; border: none; border-radius: var(--radius); font-weight: bold; cursor: pointer; }
+
+        /* ADM */
+        #admin-panel { display: none; background: white; padding: 20px; border-radius: var(--radius); margin-top: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        .btn-save { background: #28a745; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; }
+
+        .hidden { display: none; }
+    </style>
+</head>
 <body>
 
 <header>
-<h1>Açaí Prime</h1>
-<p>Delivery Profissional 🍧</p>
-<nav>
-<button onclick="showClient()">Cliente</button>
-<button onclick="showAdmin()">ADM</button>
-</nav>
+    <h1>Açaí Delivery</h1>
 </header>
 
-<section id="clientSection">
+<div class="container">
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('client')">Cardápio</button>
+        <button class="tab-btn" onclick="switchTab('admin')">Painel ADM</button>
+    </div>
 
-<div class="card">
-<h2>🍧 Monte seu Açaí</h2>
-<div class="options" id="sizes"></div>
-<p id="limit"></p>
-<div id="toppings"></div>
+    <!-- ÁREA CLIENTE -->
+    <div id="client-area">
+        <div class="section-title">🍧 Monte seu Açaí</div>
+        <div id="custom-acai-list">
+            <!-- Gerado via JS -->
+        </div>
+
+        <div class="section-title">🔥 Combos Prontos</div>
+        <div id="combos-list">
+            <!-- Gerado via JS -->
+        </div>
+    </div>
+
+    <!-- ÁREA ADM LOGIN -->
+    <div id="admin-login" class="hidden">
+        <div class="item-card" style="flex-direction: column; gap: 15px;">
+            <h3>Acesso Administrativo</h3>
+            <input type="password" id="admin-pass" placeholder="Senha" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+            <button class="btn-order" onclick="loginAdmin()" style="width: 100%;">Entrar</button>
+        </div>
+    </div>
+
+    <!-- PAINEL ADM -->
+    <div id="admin-panel">
+        <h2 style="margin-bottom: 20px;">Configurações</h2>
+        <div class="form-group">
+            <label>Taxa de Entrega (R$)</label>
+            <input type="number" id="cfg-taxa" step="0.50">
+        </div>
+        <div class="form-group">
+            <label>WhatsApp (Ex: 5511999999999)</label>
+            <input type="text" id="cfg-phone">
+        </div>
+        <div class="form-group">
+            <label>Nova Senha ADM</label>
+            <input type="text" id="cfg-pass">
+        </div>
+        <button class="btn-save" onclick="saveSettings()">Salvar Alterações</button>
+        <button onclick="logoutAdmin()" style="margin-top: 10px; width: 100%; background: none; border: none; color: red; cursor: pointer;">Sair</button>
+    </div>
 </div>
 
-<div class="card">
-<h2>🔥 Combos Prontos</h2>
-<div class="options" id="combos"></div>
+<!-- MODAL DE SELEÇÃO -->
+<div id="modal-product" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modal-title">Configurar Açaí</h2>
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+        </div>
+        
+        <div id="limit-info" class="limit-warn"></div>
+
+        <div id="topping-list">
+            <!-- Acompanhamentos aparecem aqui -->
+        </div>
+
+        <div class="form-group" style="margin-top: 20px;">
+            <label>Observações:</label>
+            <input type="text" id="order-obs" placeholder="Ex: sem paçoca, mandar colher...">
+        </div>
+
+        <button class="btn-order" style="width: 100%; margin-top: 20px; padding: 18px;" onclick="confirmProduct()">Confirmar e Adicionar</button>
+    </div>
 </div>
 
-<div class="card">
-<h2>Resumo</h2>
-<textarea id="obs" placeholder="Observações"></textarea>
-<p id="summary">Nenhum pedido</p>
-<p>Entrega: R$ <span id="deliveryValue">0.00</span></p>
-<div class="total" id="totalValue">R$ 0,00</div>
-<button class="cta" onclick="send()">Finalizar no WhatsApp</button>
+<!-- BARRA DE CARRINHO -->
+<div id="cart-bar" class="cart-bar">
+    <div>
+        <span id="cart-count">1 Item</span><br>
+        <strong id="cart-total" style="color: var(--primary); font-size: 18px;">R$ 0,00</strong>
+    </div>
+    <button class="btn-order" onclick="finishOrder()">Fechar Pedido</button>
 </div>
-
-</section>
-
-<section id="adminSection" class="hidden">
-
-<div class="card" id="loginBox">
-<h2>Login ADM</h2>
-<input id="adminLoginPass" type="password" placeholder="Senha">
-<button class="cta" onclick="loginAdmin()">Entrar</button>
-</div>
-
-<div class="card hidden" id="adminPanel">
-<h2>Painel ADM</h2>
-
-<label>Senha ADM</label>
-<input id="adminPass">
-
-<label>Taxa de entrega</label>
-<input id="deliveryFee" type="number">
-
-<label>Acompanhamentos (separados por vírgula)</label>
-<textarea id="tops"></textarea>
-
-<button class="cta" onclick="save()">Salvar Configurações</button>
-</div>
-
-</section>
 
 <script>
-let cfg=JSON.parse(localStorage.getItem('cfg'))||{
- pass:'1234',
- delivery:5,
- sizes:[
-  {name:'Açaí Raiz 300ml',price:12,limit:2,img:'https://via.placeholder.com/300x200?text=300ml'},
-  {name:'Açaí Raiz 500ml',price:18,limit:3,img:'https://via.placeholder.com/300x200?text=500ml'},
-  {name:'Açaí Raiz 700ml',price:24,limit:4,img:'https://via.placeholder.com/300x200?text=700ml'}
- ],
- toppings:['Banana','Morango','Granola','Leite em pó','Paçoca'],
- combos:[
-  {name:'Açaí Power Banana',price:20,items:['Banana','Granola'],img:'https://via.placeholder.com/300x200?text=Power'},
-  {name:'Açaí Trufado',price:22,items:['Leite em pó','Chocolate'],img:'https://via.placeholder.com/300x200?text=Trufado'}
- ]
-};
+    /* BANCO DE DADOS LOCAL (DEFAULT) */
+    let settings = {
+        taxa: 5.00,
+        phone: "5511999999999",
+        pass: "1234"
+    };
 
-let sel={mode:null,size:null,combo:null,tops:[]};
+    const products = [
+        { id: 1, type: 'custom', name: 'Açaí Raiz 300ml', price: 15.00, limit: 3 },
+        { id: 2, type: 'custom', name: 'Açaí Raiz 500ml', price: 22.00, limit: 5 },
+        { id: 3, type: 'custom', name: 'Açaí Raiz 700ml', price: 28.00, limit: 7 },
+        { id: 4, type: 'combo', name: 'Combo Power Banana', price: 20.00, desc: 'Banana + Granola + Mel' },
+        { id: 5, type: 'combo', name: 'Combo Trufado', price: 25.00, desc: 'Chocolate + Leite em Pó' }
+    ];
 
-function showClient(){
- clientSection.classList.remove('hidden');
- adminSection.classList.add('hidden');
-}
+    const toppings = ["Banana", "Morango", "Granola", "Leite em Pó", "Paçoca", "Calda de Chocolate", "Mel", "Leite Condensado"];
 
-function showAdmin(){
- clientSection.classList.add('hidden');
- adminSection.classList.remove('hidden');
-}
+    let currentOrder = null;
+    let isAdmin = false;
 
-function renderSizes(){
- sizes.innerHTML='';
- cfg.sizes.forEach(o=>{
-  const d=document.createElement('div');
-  d.className='option';
-  d.innerHTML=`<img src="${o.img}"><strong>${o.name}</strong><br>R$ ${o.price}`;
-  d.onclick=()=>{
-   sel={mode:'free',size:o,combo:null,tops:[]};
-   document.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
-   d.classList.add('active');
-   limit.innerText=`Até ${o.limit} acompanhamentos`;
-   renderToppings(o);
-   update();
-  };
-  sizes.appendChild(d);
- });
-}
+    /* INICIALIZAÇÃO */
+    function init() {
+        const saved = localStorage.getItem('acai_settings');
+        if (saved) settings = JSON.parse(saved);
+        
+        renderMenu();
+    }
 
-function renderToppings(o){
- toppings.innerHTML='';
- cfg.toppings.forEach(t=>{
-  const l=document.createElement('label');
-  l.innerHTML=`<input type="checkbox"> ${t}`;
-  l.querySelector('input').onchange=e=>{
-   if(e.target.checked){
-    if(sel.tops.length>=o.limit){e.target.checked=false;return}
-    sel.tops.push(t);
-   }else sel.tops=sel.tops.filter(x=>x!==t);
-   update();
-  };
-  toppings.appendChild(l);
- });
-}
+    function renderMenu() {
+        const customList = document.getElementById('custom-acai-list');
+        const comboList = document.getElementById('combos-list');
+        
+        customList.innerHTML = '';
+        comboList.innerHTML = '';
 
-function renderCombos(){
- combos.innerHTML='';
- cfg.combos.forEach(c=>{
-  const d=document.createElement('div');
-  d.className='option';
-  d.innerHTML=`<img src="${c.img}"><strong>${c.name}</strong><br>R$ ${c.price}`;
-  d.onclick=()=>{
-   sel={mode:'combo',combo:c,size:null,tops:[]};
-   document.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));
-   d.classList.add('active');
-   limit.innerText='';
-   toppings.innerHTML='';
-   update();
-  };
-  combos.appendChild(d);
- });
-}
+        products.forEach(p => {
+            const html = `
+                <div class="item-card" onclick="openProduct(${p.id})">
+                    <div class="item-info">
+                        <h3>${p.name}</h3>
+                        <p>${p.type === 'custom' ? `Escolha até ${p.limit} adicionais` : p.desc}</p>
+                    </div>
+                    <div class="item-price">R$ ${p.price.toFixed(2)}</div>
+                </div>
+            `;
+            if (p.type === 'custom') customList.innerHTML += html;
+            else comboList.innerHTML += html;
+        });
+    }
 
-function update(){
- let total=cfg.delivery;
- let text='Nenhum pedido';
+    /* LÓGICA DO PEDIDO */
+    function openProduct(id) {
+        const p = products.find(x => x.id === id);
+        currentOrder = { ...p, selectedToppings: [], obs: '' };
 
- if(sel.mode==='free'){
-  total+=sel.size.price;
-  text=`${sel.size.name} com ${sel.tops.join(', ')||'sem acompanhamento'}`;
- }
- if(sel.mode==='combo'){
-  total+=sel.combo.price;
-  text=`${sel.combo.name} (${sel.combo.items.join(', ')})`;
- }
+        document.getElementById('modal-title').innerText = p.name;
+        const list = document.getElementById('topping-list');
+        const limitInfo = document.getElementById('limit-info');
+        list.innerHTML = '';
 
- summary.innerText=text;
- deliveryValue.innerText=cfg.delivery.toFixed(2);
- totalValue.innerText='R$ '+total.toFixed(2);
-}
+        if (p.type === 'custom') {
+            limitInfo.style.display = 'block';
+            limitInfo.innerText = `Você pode escolher até ${p.limit} acompanhamentos inclusos.`;
+            
+            toppings.forEach(t => {
+                list.innerHTML += `
+                    <div class="topping-item">
+                        <span>${t}</span>
+                        <input type="checkbox" value="${t}" onchange="handleTopping(this, ${p.limit})">
+                    </div>
+                `;
+            });
+        } else {
+            limitInfo.style.display = 'none';
+            list.innerHTML = `<p style="color: #666 italic">Este combo já vem pronto com os melhores ingredientes.</p>`;
+        }
 
-function send(){
- if(!sel.mode)return;
- const msg=`Pedido:
-${summary.innerText}
-Obs: ${obs.value}
-Total: ${totalValue.innerText}`;
- window.open('https://wa.me/5599999999999?text='+encodeURIComponent(msg));
-}
+        document.getElementById('modal-product').style.display = 'flex';
+    }
 
-/* ===== ADM ===== */
-function loginAdmin(){
- if(adminLoginPass.value===cfg.pass){
-  loginBox.classList.add('hidden');
-  adminPanel.classList.remove('hidden');
-  adminPass.value=cfg.pass;
-  deliveryFee.value=cfg.delivery;
-  tops.value=cfg.toppings.join(', ');
- }else{
-  alert('Senha incorreta');
- }
-}
+    function handleTopping(el, limit) {
+        const checked = document.querySelectorAll('#topping-list input:checked');
+        if (checked.length > limit) {
+            el.checked = false;
+            alert(`Limite de ${limit} acompanhamentos atingido!`);
+        }
+    }
 
-function save(){
- cfg.pass=adminPass.value;
- cfg.delivery=Number(deliveryFee.value);
- cfg.toppings=tops.value.split(',').map(t=>t.trim());
- localStorage.setItem('cfg',JSON.stringify(cfg));
- alert('Configurações salvas');
- location.reload();
-}
+    function closeModal() {
+        document.getElementById('modal-product').style.display = 'none';
+    }
 
-renderSizes();
-renderCombos();
+    function confirmProduct() {
+        const checked = document.querySelectorAll('#topping-list input:checked');
+        currentOrder.selectedToppings = Array.from(checked).map(c => c.value);
+        currentOrder.obs = document.getElementById('order-obs').value;
+
+        closeModal();
+        showCartBar();
+    }
+
+    function showCartBar() {
+        const bar = document.getElementById('cart-bar');
+        const total = currentOrder.price + settings.taxa;
+        
+        document.getElementById('cart-count').innerText = `1 Produto + Entrega`;
+        document.getElementById('cart-total').innerText = `Total: R$ ${total.toFixed(2)}`;
+        bar.style.display = 'flex';
+    }
+
+    function finishOrder() {
+        const total = currentOrder.price + settings.taxa;
+        const msg = `*NOVO PEDIDO AÇAÍ*%0A----------------------------%0A*Produto:* ${currentOrder.name}%0A*Adicionais:* ${currentOrder.selectedToppings.join(', ') || 'Nenhum'}%0A*Obs:* ${currentOrder.obs || 'Nenhuma'}%0A----------------------------%0A*Subtotal:* R$ ${currentOrder.price.toFixed(2)}%0A*Taxa Entrega:* R$ ${settings.taxa.toFixed(2)}%0A*TOTAL:* R$ ${total.toFixed(2)}`;
+        
+        window.open(`https://wa.me/${settings.phone}?text=${msg}`);
+    }
+
+    /* ÁREA ADMINISTRATIVA */
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+
+        if (tab === 'client') {
+            document.getElementById('client-area').classList.remove('hidden');
+            document.getElementById('admin-login').classList.add('hidden');
+            document.getElementById('admin-panel').style.display = 'none';
+        } else {
+            document.getElementById('client-area').classList.add('hidden');
+            if (isAdmin) {
+                showAdminPanel();
+            } else {
+                document.getElementById('admin-login').classList.remove('hidden');
+            }
+        }
+    }
+
+    function loginAdmin() {
+        const pass = document.getElementById('admin-pass').value;
+        if (pass === settings.pass) {
+            isAdmin = true;
+            showAdminPanel();
+        } else {
+            alert('Senha incorreta!');
+        }
+    }
+
+    function showAdminPanel() {
+        document.getElementById('admin-login').classList.add('hidden');
+        document.getElementById('admin-panel').style.display = 'block';
+        document.getElementById('cfg-taxa').value = settings.taxa;
+        document.getElementById('cfg-phone').value = settings.phone;
+        document.getElementById('cfg-pass').value = settings.pass;
+    }
+
+    function saveSettings() {
+        settings.taxa = parseFloat(document.getElementById('cfg-taxa').value);
+        settings.phone = document.getElementById('cfg-phone').value;
+        settings.pass = document.getElementById('cfg-pass').value;
+
+        localStorage.setItem('acai_settings', JSON.stringify(settings));
+        alert('Configurações salvas!');
+        location.reload();
+    }
+
+    function logoutAdmin() {
+        isAdmin = false;
+        location.reload();
+    }
+
+    init();
 </script>
 
 </body>
