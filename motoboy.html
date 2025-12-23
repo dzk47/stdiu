@@ -1,38 +1,47 @@
-<!-- ... (mesmo cabeçalho do motoboy anterior) ... -->
-    <script>
-        function carregarEntregas() {
-            const pedidos = JSON.parse(localStorage.getItem('pedidos_fila')) || [];
-            const container = document.getElementById('lista-entregas');
-            
-            if(pedidos.length === 0) {
-                container.innerHTML = '<p class="text-center text-slate-500 mt-10">Nenhum pedido pendente.</p>';
-                return;
-            }
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-            container.innerHTML = pedidos.map((p, idx) => `
-                <div class="bg-slate-800 p-4 rounded-2xl border-l-4 border-yellow-500 mb-4">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="text-xs text-slate-400">#${p.id}</span>
-                        <span class="bg-green-600 text-white text-[10px] font-bold px-2 py-1 rounded">GANHO: R$ ${p.taxa}</span>
-                    </div>
-                    <p class="font-bold text-lg">${p.item}</p>
-                    <p class="text-sm text-slate-300 mt-1 italic">📍 ${p.cliente}</p>
-                    
-                    <div class="flex gap-2 mt-4">
-                        <!-- BOTÃO DE MAPA REAL -->
-                        <a href="https://www.google.com/maps/search/?api=1&query=${p.coords.lat},${p.coords.lon}" 
-                           target="_blank"
-                           class="flex-1 bg-blue-600 text-center py-3 rounded-xl font-bold text-sm">
-                           🗺️ Abrir Mapa
-                        </a>
-                        
-                        <button onclick="concluir(${idx})" class="flex-1 bg-green-600 py-3 rounded-xl font-bold text-sm">
-                           ✅ Entregue
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-        // ... (resto do script igual) ...
-    </script>
-<!-- ... -->
+  const firebaseConfig = { /* COLE O SEU CONFIG AQUI NOVAMENTE */ };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // OUVIR PEDIDOS EM TEMPO REAL
+  const pedidosRef = ref(db, 'pedidos');
+  onValue(pedidosRef, (snapshot) => {
+    const pedidos = snapshot.val();
+    const container = document.getElementById('lista-entregas');
+    container.innerHTML = ""; // Limpa a lista antes de atualizar
+
+    if (!pedidos) {
+      container.innerHTML = "<p class='text-center'>Nenhuma entrega agora.</p>";
+      return;
+    }
+
+    // Toca um som de alerta se quiser
+    // new Audio('alerta.mp3').play();
+
+    for (let id in pedidos) {
+      const p = pedidos[id];
+      container.innerHTML += `
+        <div class="bg-slate-800 p-4 rounded-2xl mb-4 border-l-4 border-yellow-500">
+           <p class="font-bold text-lg">${p.item}</p>
+           <p class="text-sm text-slate-300">📍 ${p.cliente}</p>
+           <div class="flex gap-2 mt-4">
+              <a href="https://www.google.com/maps/search/?api=1&query=${p.coords.lat},${p.coords.lon}" 
+                 target="_blank" class="flex-1 bg-blue-600 py-2 rounded-lg text-center font-bold">🗺️ Ver Mapa</a>
+              <button onclick="marcarEntregue('${id}')" class="flex-1 bg-green-600 py-2 rounded-lg font-bold">✅ Entregue</button>
+           </div>
+        </div>
+      `;
+    }
+  });
+
+  // Função para deletar o pedido quando o motoboy entregar
+  window.marcarEntregue = (id) => {
+    if(confirm("Confirmar entrega?")) {
+      remove(ref(db, `pedidos/${id}`));
+    }
+  };
+</script>
