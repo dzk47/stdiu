@@ -3,50 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Açaí Supreme - Pedir</title>
+    <title>Açaí Supreme</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #f8f9fa; font-family: sans-serif; }
         .acai-gradient { background: linear-gradient(135deg, #4b0082 0%, #310055 100%); }
-        .active-card { border: 3px solid #4b0082 !important; transform: scale(1.02); }
+        .tab-bar { backdrop-filter: blur(10px); background: rgba(255,255,255,0.8); }
+        body { font-family: 'Inter', sans-serif; background: #fdfdfd; }
     </style>
 </head>
-<body class="pb-32">
-
-    <div class="acai-gradient text-white p-8 rounded-b-[40px] shadow-xl">
-        <h1 class="text-2xl font-black italic">AÇAÍ SUPREME</h1>
-        <div class="bg-white rounded-2xl p-2 mt-4 flex items-center gap-2">
-            <button onclick="window.getGPS()" class="p-2 bg-purple-100 rounded-xl">📍</button>
-            <input type="text" id="address" placeholder="Seu endereço aqui..." class="w-full outline-none text-sm text-gray-800 px-2">
+<body class="pb-24">
+    <!-- Header -->
+    <header class="acai-gradient p-6 rounded-b-[40px] text-white shadow-2xl">
+        <h1 class="text-3xl font-black italic tracking-tighter">AÇAÍ SUPREME</h1>
+        <div class="mt-4 flex bg-white/20 p-3 rounded-2xl backdrop-blur-md">
+            <input type="text" id="address" placeholder="Endereço de entrega..." class="bg-transparent border-none outline-none w-full text-sm placeholder-purple-200">
+            <button onclick="window.getGPS()">📍</button>
         </div>
-        <p id="taxa-info" class="text-[10px] mt-2 text-purple-200"></p>
+    </header>
+
+    <!-- Status de Acompanhamento -->
+    <div id="tracking" class="p-4 hidden">
+        <div class="bg-purple-100 border-2 border-purple-500 p-4 rounded-3xl flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-bold text-purple-600 uppercase">Seu pedido está:</p>
+                <p id="status-display" class="font-black text-purple-900">Aguardando...</p>
+            </div>
+            <div class="animate-bounce text-2xl">🍧</div>
+        </div>
     </div>
 
-    <main class="p-4 grid grid-cols-2 gap-4 mt-4" id="menu-container">
-        <!-- Itens Fixos para Teste -->
-        <div class="bg-white rounded-[30px] p-3 shadow-md border border-gray-100" id="item-1" onclick="window.selectItem(1, 'Copo Supreme 500ml', 25.90)">
-            <img src="https://images.unsplash.com/photo-1590301157890-4810ed352733?w=200" class="w-full h-24 object-cover rounded-[20px] mb-2">
-            <h3 class="font-bold text-xs">Copo Supreme 500ml</h3>
-            <p class="font-bold text-purple-600">R$ 25,90</p>
+    <!-- Lista de Produtos -->
+    <div class="p-4 grid gap-4" id="menu">
+        <div onclick="window.openToppings('Copo 500ml', 22.90)" class="bg-white p-4 rounded-[30px] shadow-sm flex items-center gap-4 border border-gray-100">
+            <img src="https://images.unsplash.com/photo-1590301157890-4810ed352733?w=150" class="w-20 h-20 rounded-2xl object-cover">
+            <div class="flex-1">
+                <h3 class="font-bold">Copo Tradicional 500ml</h3>
+                <p class="text-xs text-gray-400">Escolha até 3 adicionais</p>
+                <p class="font-bold text-purple-600 mt-1">R$ 22,90</p>
+            </div>
         </div>
-        <div class="bg-white rounded-[30px] p-3 shadow-md border border-gray-100" id="item-2" onclick="window.selectItem(2, 'Barca Especial G', 49.90)">
-            <img src="https://images.unsplash.com/photo-1553177595-4de2bb0842b9?w=200" class="w-full h-24 object-cover rounded-[20px] mb-2">
-            <h3 class="font-bold text-xs">Barca Especial G</h3>
-            <p class="font-bold text-purple-600 text-sm">R$ 49.90</p>
-        </div>
-    </main>
+    </div>
 
-    <div id="cart-float" class="fixed bottom-6 left-4 right-4 bg-purple-900 text-white p-4 rounded-3xl flex justify-between items-center shadow-2xl hidden">
-        <div>
-            <p class="text-xs opacity-70" id="cart-item-name">Selecionado</p>
-            <p class="font-bold" id="cart-total-display">R$ 0,00</p>
+    <!-- Modal de Adicionais -->
+    <div id="modal-toppings" class="fixed inset-0 bg-black/60 hidden flex items-end z-50">
+        <div class="bg-white w-full p-6 rounded-t-[40px] animate-slide-up">
+            <h2 class="text-xl font-bold mb-4">Escolha os Adicionais (Max 3)</h2>
+            <div class="grid grid-cols-2 gap-2 text-sm" id="toppings-options">
+                <!-- JS preenche -->
+            </div>
+            <button onclick="window.addToCart()" class="w-full acai-gradient text-white py-4 rounded-2xl font-bold mt-6 shadow-lg">Adicionar à Sacola</button>
         </div>
-        <button onclick="window.enviarPedido()" class="bg-white text-purple-900 px-6 py-2 rounded-xl font-bold">Pedir</button>
+    </div>
+
+    <!-- Carrinho -->
+    <div id="cart-btn" class="fixed bottom-6 left-4 right-4 acai-gradient p-4 rounded-3xl hidden flex justify-between items-center text-white shadow-2xl">
+        <span id="cart-info" class="font-bold">1 Item | R$ 22,90</span>
+        <button onclick="window.confirmarPedido()" class="bg-white text-purple-900 px-6 py-2 rounded-xl font-black">PEDIR AGORA</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB1DaTOer5_cZ-JT15FlZGapNV1nUDrhmE",
@@ -61,57 +78,66 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Variáveis globais de controle
-        window.selectedProduct = null;
-        window.clientCoords = { lat: 0, lon: 0 };
-        window.taxaEntrega = 5.00; // Valor fixo para teste
+        window.currentOrder = { item: "", preco: 0, adicionais: [] };
+        const toppings = ["Leite Ninho", "Morango", "Banana", "Granola", "Nutella", "Ovomaltine", "Paçoca", "Leite Condensado"];
 
-        // 1. Função de Selecionar Produto
-        window.selectItem = (id, nome, preco) => {
-            window.selectedProduct = { nome, preco };
-            document.querySelectorAll('#menu-container > div').forEach(el => el.classList.remove('active-card'));
-            document.getElementById(`item-${id}`).classList.add('active-card');
-            
-            document.getElementById('cart-float').classList.remove('hidden');
-            document.getElementById('cart-item-name').innerText = nome;
-            const total = preco + window.taxaEntrega;
-            document.getElementById('cart-total-display').innerText = `R$ ${total.toFixed(2)} (+taxa)`;
+        window.openToppings = (nome, preco) => {
+            window.currentOrder = { item: nome, preco: preco, adicionais: [] };
+            const container = document.getElementById('toppings-options');
+            container.innerHTML = toppings.map(t => `
+                <label class="flex items-center p-3 border rounded-xl gap-2">
+                    <input type="checkbox" value="${t}" onchange="window.limitCheck(this)"> ${t}
+                </label>
+            `).join('');
+            document.getElementById('modal-toppings').classList.remove('hidden');
         };
 
-        // 2. Função de GPS
-        window.getGPS = () => {
-            if (!navigator.geolocation) return alert("Sem GPS disponível");
-            navigator.geolocation.getCurrentPosition((pos) => {
-                window.clientCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-                document.getElementById('address').value = "Localização via GPS ativa ✓";
-                document.getElementById('taxa-info').innerText = "Distância calculada! Taxa: R$ 5,00";
-            });
+        window.limitCheck = (el) => {
+            const checked = document.querySelectorAll('#toppings-options input:checked');
+            if (checked.length > 3) { el.checked = false; alert("Limite de 3 itens atingido!"); }
         };
 
-        // 3. ENVIAR PARA O FIREBASE (Ação Real)
-        window.enviarPedido = async () => {
+        window.addToCart = () => {
+            const checked = Array.from(document.querySelectorAll('#toppings-options input:checked')).map(i => i.value);
+            window.currentOrder.adicionais = checked;
+            document.getElementById('modal-toppings').classList.add('hidden');
+            document.getElementById('cart-btn').classList.remove('hidden');
+            document.getElementById('cart-info').innerText = `${window.currentOrder.item} (R$ ${window.currentOrder.preco.toFixed(2)})`;
+        };
+
+        window.confirmarPedido = async () => {
             const addr = document.getElementById('address').value;
-            if (!addr || !window.selectedProduct) return alert("Preencha o endereço e escolha o açaí!");
-
+            if(!addr) return alert("Preencha o endereço!");
+            
             const pedido = {
-                id: Date.now(),
+                ...window.currentOrder,
                 cliente: addr,
-                item: window.selectedProduct.nome,
-                total: (window.selectedProduct.preco + window.taxaEntrega).toFixed(2),
-                coords: window.clientCoords,
                 status: "pendente",
-                hora: new Date().toLocaleTimeString()
+                total: window.currentOrder.preco + 5.0, // + taxa
+                data: new Date().toLocaleTimeString(),
+                id: Math.floor(Math.random() * 9999)
             };
 
-            try {
-                const pedidosRef = ref(db, 'pedidos');
-                await push(pedidosRef, pedido);
-                alert("✓ Pedido Enviado! O motoboy já foi avisado.");
-                location.reload(); // Reseta o app
-            } catch (e) {
-                console.error(e);
-                alert("Erro ao enviar. Verifique sua internet.");
-            }
+            const refPedido = push(ref(db, 'pedidos'));
+            await set(refPedido, pedido);
+            
+            document.getElementById('cart-btn').classList.add('hidden');
+            document.getElementById('tracking').classList.remove('hidden');
+            
+            onValue(refPedido, (snap) => {
+                const p = snap.val();
+                if(p) {
+                    const statusText = { pendente: "Aguardando Loja...", preparando: "Preparando seu Açaí...", entrega: "Saiu para Entrega!", concluido: "Entregue!" };
+                    document.getElementById('status-display').innerText = statusText[p.status];
+                }
+            });
+        };
+        
+        window.getGPS = () => {
+            navigator.geolocation.getCurrentPosition(p => {
+                document.getElementById('address').value = `GPS: ${p.coords.latitude.toFixed(4)}, ${p.coords.longitude.toFixed(4)}`;
+                window.currentCoords = { lat: p.coords.latitude, lon: p.coords.longitude };
+            });
         };
     </script>
 </body>
