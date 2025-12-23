@@ -2,83 +2,66 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADM - Gerenciar Loja</title>
+    <title>ADM - Gestão de Vendas</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 p-4">
-    <h1 class="text-2xl font-bold mb-6 text-purple-900">Configurações da Loja</h1>
-
-    <div class="space-y-6">
-        <!-- CONFIGS GERAIS -->
-        <div class="bg-white p-4 rounded-xl shadow">
-            <h2 class="font-bold mb-4 border-b pb-2">Geral & Frete</h2>
-            <label class="block text-sm mb-1">Valor por KM (R$)</label>
-            <input type="number" id="taxa-km" class="w-full border p-2 rounded mb-4">
-            
-            <label class="block text-sm mb-1">WhatsApp da Loja</label>
-            <input type="text" id="loja-fone" class="w-full border p-2 rounded mb-4">
-            
-            <button onclick="saveGeneral()" class="w-full bg-purple-600 text-white p-2 rounded font-bold">Salvar Configs</button>
+<body class="bg-slate-50 p-6">
+    <div class="flex justify-between items-center mb-10">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900">PAINEL DE COMANDOS</h1>
+            <p class="text-slate-500">Gestão de Pedidos e Faturamento</p>
         </div>
-
-        <!-- GERENCIAR CARDÁPIO -->
-        <div class="bg-white p-4 rounded-xl shadow">
-            <h2 class="font-bold mb-4 border-b pb-2">Cardápio</h2>
-            <div class="flex gap-2 mb-4">
-                <input type="text" id="new-name" placeholder="Produto" class="flex-1 border p-2 rounded text-sm">
-                <input type="number" id="new-price" placeholder="R$" class="w-20 border p-2 rounded text-sm">
-                <button onclick="addItem()" class="bg-green-600 text-white px-4 rounded font-bold">+</button>
-            </div>
-            <div id="admin-menu" class="space-y-2">
-                <!-- Itens aqui -->
-            </div>
+        <div class="bg-white p-4 rounded-3xl shadow-sm text-right">
+            <p class="text-[10px] uppercase font-bold text-gray-400">Vendas de Hoje</p>
+            <p id="total-vendas" class="text-2xl font-black text-green-600">R$ 0,00</p>
         </div>
     </div>
 
-    <script>
-        let settings = JSON.parse(localStorage.getItem('acai_settings')) || { taxaKm: 2.0, phone: "5511999999999", storeCoords: {lat: -23.55, lon: -46.63} };
-        let menu = JSON.parse(localStorage.getItem('acai_menu')) || [];
+    <div id="lista-adm" class="grid gap-6"></div>
 
-        function init() {
-            document.getElementById('taxa-km').value = settings.taxaKm;
-            document.getElementById('loja-fone').value = settings.phone;
-            renderMenu();
-        }
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        function saveGeneral() {
-            settings.taxaKm = parseFloat(document.getElementById('taxa-km').value);
-            settings.phone = document.getElementById('loja-fone').value;
-            localStorage.setItem('acai_settings', JSON.stringify(settings));
-            alert("Salvo!");
-        }
+        const firebaseConfig = { /* COLE O SEU CONFIG AQUI */ };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-        function renderMenu() {
-            const container = document.getElementById('admin-menu');
-            container.innerHTML = menu.map((item, idx) => `
-                <div class="flex justify-between items-center bg-gray-50 p-2 rounded border">
-                    <span class="text-sm">${item.name} - <b>R$ ${parseFloat(item.price).toFixed(2)}</b></span>
-                    <button onclick="removeItem(${idx})" class="text-red-500 font-bold">Excluir</button>
-                </div>
-            `).join('');
-        }
+        onValue(ref(db, 'pedidos'), (snapshot) => {
+            const pedidos = snapshot.val();
+            const container = document.getElementById('lista-adm');
+            let totalDia = 0;
+            container.innerHTML = "";
 
-        function addItem() {
-            const name = document.getElementById('new-name').value;
-            const price = document.getElementById('new-price').value;
-            if(!name || !price) return;
-            menu.push({ id: Date.now(), name, price: parseFloat(price) });
-            localStorage.setItem('acai_menu', JSON.stringify(menu));
-            renderMenu();
-        }
+            for(let id in pedidos) {
+                const p = pedidos[id];
+                if(p.status === 'concluido') { totalDia += p.total; continue; }
 
-        function removeItem(idx) {
-            menu.splice(idx, 1);
-            localStorage.setItem('acai_menu', JSON.stringify(menu));
-            renderMenu();
-        }
+                container.innerHTML += `
+                    <div class="bg-white p-6 rounded-[35px] shadow-sm border border-gray-100">
+                        <div class="flex justify-between mb-4">
+                            <span class="text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full font-bold">● Status: ${p.status}</span>
+                            <span class="text-xs text-gray-400">${p.data}</span>
+                        </div>
+                        <h2 class="text-xl font-bold">${p.item}</h2>
+                        <p class="text-sm text-purple-600 font-bold mb-2">+ ${p.adicionais.join(', ')}</p>
+                        <p class="text-sm text-gray-500 mb-6 italic">📍 ${p.cliente}</p>
+                        
+                        <div class="flex gap-2">
+                            ${p.status === 'pendente' ? 
+                                `<button onclick="window.atualizar('${id}', 'preparando')" class="flex-1 bg-purple-600 text-white py-3 rounded-2xl font-bold">Aceitar Pedido</button>` : 
+                                `<button onclick="window.atualizar('${id}', 'entrega')" class="flex-1 bg-orange-500 text-white py-3 rounded-2xl font-bold">Enviar p/ Entrega 🛵</button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }
+            document.getElementById('total-vendas').innerText = `R$ ${totalDia.toFixed(2)}`;
+        });
 
-        init();
+        window.atualizar = (id, status) => {
+            update(ref(db, `pedidos/${id}`), { status });
+        };
     </script>
 </body>
 </html>
