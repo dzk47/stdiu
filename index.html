@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio Pro | Agendamento & Gestão</title>
+    <title>Studio Pro | Agendamento Online</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root { --primary: #C5A059; --bg: #FAF9F6; --text: #1A1A1A; --card-bg: #FFFFFF; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); scroll-behavior: smooth; transition: all 0.5s ease; }
+        :root { --primary: #C5A059; --bg: #FAF9F6; --text: #1A1A1A; --card: #FFFFFF; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); transition: 0.5s; }
         h1, h2, h3, h4 { font-family: 'Playfair Display', serif; }
         .btn-theme { background: var(--primary); color: white; transition: 0.3s; font-weight: bold; border-radius: 1rem; }
         .btn-theme:hover { filter: brightness(90%); transform: translateY(-2px); }
-        .glass { background: var(--card-bg); border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
-        .card-service { border: 1px solid #eee; transition: 0.3s; cursor: pointer; border-radius: 1.2rem; background: var(--card-bg); padding: 1.5rem; }
+        .glass { background: var(--card); border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+        .card-service { border: 1px solid #eee; transition: 0.3s; cursor: pointer; border-radius: 1.5rem; background: var(--card); }
         .card-service.active { border-color: var(--primary); background: rgba(0,0,0,0.02); transform: scale(1.01); }
-        .hour-pill { border: 1px solid #e5e7eb; padding: 12px; border-radius: 12px; text-align: center; font-size: 13px; font-weight: 600; cursor: pointer; background: var(--card-bg); }
+        .hour-pill { border: 1px solid #e5e7eb; padding: 12px; border-radius: 12px; text-align: center; cursor: pointer; background: var(--card); font-weight: 600; font-size: 13px; }
         .hour-pill.selected { background: var(--primary); color: white; border-color: var(--primary); }
         .hour-pill.disabled { background: #f9fafb; color: #d1d5db; cursor: not-allowed; text-decoration: line-through; border-style: dashed; }
         .hour-pill.blocked { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
         .view-section { display: none; }
         .tab-btn.active { border-bottom: 3px solid var(--primary); color: var(--primary); font-weight: 800; }
-        input { border: 1px solid #e2e8f0 !important; border-radius: 1rem !important; padding: 1rem !important; outline: none; background: white !important; width: 100%; text-align: center; color: #1a1a1a !important; }
+        input { border: 1px solid #e2e8f0 !important; border-radius: 1rem !important; padding: 1rem !important; outline: none; background: white !important; color: #1a1a1a !important; }
         .status-badge { font-size: 8px; padding: 2px 10px; border-radius: 30px; font-weight: 800; text-transform: uppercase; }
     </style>
 </head>
@@ -32,12 +32,12 @@
     <!-- NAV -->
     <nav class="p-6 flex justify-between items-center max-w-6xl mx-auto sticky top-0 z-50 backdrop-blur-xl">
         <div class="flex items-center gap-4">
-            <h1 id="brand-name" class="italic text-2xl font-medium leading-none">Studio Pro</h1>
-            <a id="link-insta" href="#" target="_blank" class="text-stone-400 hover:text-pink-500 transition-all">
+            <h1 id="brand-name" class="italic text-2xl font-medium leading-none text-stone-900 italic">Studio Pro</h1>
+            <a id="link-insta" href="#" target="_blank" class="text-stone-400 hover:text-stone-900 transition-all">
                 <i data-lucide="instagram" class="w-5 h-5"></i>
             </a>
         </div>
-        <button onclick="window.requestAdmin()" class="w-10 h-10 rounded-xl flex items-center justify-center border border-stone-200 hover:bg-white transition-all shadow-sm">
+        <button onclick="window.requestAdmin()" class="w-10 h-10 rounded-xl flex items-center justify-center border border-stone-100 hover:bg-white transition-all shadow-sm">
             <i data-lucide="layout-dashboard" class="text-stone-400 w-5 h-5"></i>
         </button>
     </nav>
@@ -45,20 +45,20 @@
     <!-- [CLIENTE] -->
     <main id="view-cliente" class="view-section max-w-2xl mx-auto p-6 pb-24">
         <header class="text-center py-16">
-            <h2 class="text-4xl lg:text-5xl font-light mb-4 italic leading-tight">Sua melhor versão começa aqui.</h2>
+            <h2 id="client-slogan" class="text-4xl lg:text-5xl font-light mb-4 italic leading-tight">Carregando Studio...</h2>
             <p class="text-stone-400 text-[10px] uppercase tracking-[0.5em] font-bold">Agendamento Online</p>
         </header>
 
         <div class="glass p-8 rounded-[2.5rem] mb-12">
             <h3 class="font-bold text-xs uppercase tracking-widest mb-8 border-b pb-4 italic text-stone-400">1. Escolha seus serviços</h3>
             <div id="services-grid" class="space-y-4"></div>
-            <div id="total-bar" class="hidden mt-10 pt-8 border-t flex justify-between items-center">
+            <div id="total-bar" class="hidden mt-10 pt-8 border-t flex justify-between items-center text-stone-900">
                 <span id="display-total" class="text-3xl font-bold italic tracking-tighter">R$ 0,00</span>
                 <button onclick="window.showStep2()" class="btn-theme px-10 py-4 uppercase text-[10px] shadow-xl">Próximo</button>
             </div>
         </div>
 
-        <section id="step-2" class="hidden glass p-10 rounded-[3rem] mb-12 text-center">
+        <section id="step-2" class="hidden glass p-10 rounded-[3rem] mb-12 text-center shadow-sm">
             <input type="date" id="c-date" onchange="window.loadHours()" class="mb-10">
             <div id="hours-grid" class="grid grid-cols-3 gap-3"></div>
         </section>
@@ -84,16 +84,16 @@
         </div>
 
         <div class="flex gap-4 mb-10 border-b overflow-x-auto text-stone-400">
-            <button onclick="window.showTab('agenda')" id="tab-agenda" class="tab-btn pb-4 text-xs font-bold active uppercase">Agenda</button>
-            <button onclick="window.showTab('grade')" id="tab-grade" class="tab-btn pb-4 text-xs font-bold uppercase">Bloqueio</button>
-            <button onclick="window.showTab('servicos')" id="tab-servicos" class="tab-btn pb-4 text-xs font-bold uppercase">Serviços</button>
-            <button onclick="window.showTab('config')" id="tab-config" class="tab-btn pb-4 text-xs font-bold uppercase">Configuração</button>
+            <button onclick="window.showTab('agenda')" id="tab-agenda" class="tab-btn pb-4 text-xs font-bold active uppercase tracking-widest">Agenda</button>
+            <button onclick="window.showTab('grade')" id="tab-grade" class="tab-btn pb-4 text-xs font-bold uppercase tracking-widest">Bloqueio</button>
+            <button onclick="window.showTab('servicos')" id="tab-servicos" class="tab-btn pb-4 text-xs font-bold uppercase tracking-widest">Serviços</button>
+            <button onclick="window.showTab('config')" id="tab-config" class="tab-btn pb-4 text-xs font-bold uppercase tracking-widest">Configuração</button>
         </div>
 
         <!-- AGENDA -->
         <section id="content-agenda" class="tab-content">
             <div class="glass p-8 rounded-[2rem] mb-10 text-center">
-                <p class="text-stone-400 text-[10px] uppercase font-bold mb-1">Lucro Acumulado</p>
+                <p class="text-stone-400 text-[10px] uppercase font-bold mb-1">Lucro Estimado (Atendidos)</p>
                 <h3 id="stat-profit" class="text-5xl font-bold tracking-tighter italic">R$ 0,00</h3>
             </div>
             <div id="admin-list" class="space-y-4"></div>
@@ -103,48 +103,49 @@
         <section id="content-config" class="tab-content hidden">
             <div class="glass p-10 rounded-[3rem] space-y-8">
                 <div>
-                    <h4 class="font-bold text-xs uppercase text-stone-400 mb-6 italic">Personalização de Cores</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-stone-800">
-                        <button onclick="window.setTheme('nude-gold')" class="p-4 border rounded-2xl flex flex-col items-center gap-2 hover:border-stone-900">
-                            <div class="w-8 h-8 rounded-full" style="background:#C5A059; border:4px solid #FAF9F6"></div>
-                            <span class="text-[10px] font-bold">Nude & Ouro</span>
+                    <h4 class="font-bold text-xs uppercase text-stone-400 mb-6 italic">Cores do Site</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <button onclick="window.setTheme('nude-gold')" class="p-4 border rounded-2xl flex flex-col items-center gap-2">
+                            <div class="w-8 h-8 rounded-full" style="background:#C5A059; border:3px solid #FAF9F6"></div>
+                            <span class="text-[10px] font-bold">Nude & Gold</span>
                         </button>
-                        <button onclick="window.setTheme('rose-pink')" class="p-4 border rounded-2xl flex flex-col items-center gap-2 hover:border-stone-900">
-                            <div class="w-8 h-8 rounded-full" style="background:#E47481; border:4px solid #FFF5F7"></div>
-                            <span class="text-[10px] font-bold">Rose & Pink</span>
+                        <button onclick="window.setTheme('rose-pink')" class="p-4 border rounded-2xl flex flex-col items-center gap-2">
+                            <div class="w-8 h-8 rounded-full" style="background:#E47481; border:3px solid #FFF5F7"></div>
+                            <span class="text-[10px] font-bold">Rose Pink</span>
                         </button>
-                        <button onclick="window.setTheme('dark-emerald')" class="p-4 border rounded-2xl flex flex-col items-center gap-2 hover:border-stone-900">
-                            <div class="w-8 h-8 rounded-full" style="background:#10B981; border:4px solid #0F172A"></div>
+                        <button onclick="window.setTheme('dark-emerald')" class="p-4 border rounded-2xl flex flex-col items-center gap-2">
+                            <div class="w-8 h-8 rounded-full" style="background:#10B981; border:3px solid #0F172A"></div>
                             <span class="text-[10px] font-bold">Dark Green</span>
                         </button>
-                        <button onclick="window.setTheme('modern-violet')" class="p-4 border rounded-2xl flex flex-col items-center gap-2 hover:border-stone-900">
-                            <div class="w-8 h-8 rounded-full" style="background:#7C3AED; border:4px solid #F5F3FF"></div>
-                            <span class="text-[10px] font-bold">Violet</span>
+                        <button onclick="window.setTheme('modern-violet')" class="p-4 border rounded-2xl flex flex-col items-center gap-2">
+                            <div class="w-8 h-8 rounded-full" style="background:#7C3AED; border:3px solid #F5F3FF"></div>
+                            <span class="text-[10px] font-bold">Modern Violet</span>
                         </button>
                     </div>
                 </div>
 
                 <div class="space-y-4">
-                    <h4 class="font-bold text-xs uppercase text-stone-400 italic">Dados do Studio</h4>
+                    <h4 class="font-bold text-xs uppercase text-stone-400 italic">Informações do Studio</h4>
                     <input type="text" id="adm-studio-name" placeholder="Nome Comercial">
                     <input type="text" id="adm-studio-zap" placeholder="WhatsApp (55...)">
-                    <input type="text" id="adm-insta-link" placeholder="Link do Instagram (https://...)">
-                    <input type="text" id="adm-address" placeholder="Endereço">
-                    <input type="text" id="adm-maps-link" placeholder="Link do Google Maps">
-                    <button onclick="window.updateStudioConfig()" class="w-full btn-theme py-5 uppercase text-[10px]">Salvar Todas as Configurações</button>
+                    <input type="text" id="adm-insta-link" placeholder="Link Instagram">
+                    <input type="text" id="adm-address" placeholder="Endereço Visível">
+                    <input type="text" id="adm-maps-link" placeholder="Link Google Maps">
+                    <button onclick="window.updateStudioConfig()" class="w-full btn-theme py-5 uppercase text-[10px]">Salvar Configurações</button>
                 </div>
             </div>
         </section>
 
-        <!-- TABS AUXILIARES -->
+        <!-- TABS AUXILIARES (SERVICOS E GRADE) -->
         <section id="content-servicos" class="tab-content hidden">
             <div class="glass p-8 rounded-[2rem] mb-10"><div class="flex gap-4"><input type="text" id="add-s-name" placeholder="Serviço" class="flex-1"><input type="text" id="add-s-price" placeholder="Preço"><button onclick="window.addService()" class="btn-theme px-8 text-xs uppercase">Salvar</button></div></div>
-            <div id="admin-services-list" class="grid md:grid-cols-2 gap-4"></div>
+            <div id="admin-services-list" class="grid md:grid-cols-2 gap-4 text-stone-900"></div>
         </section>
-        <section id="content-grade" class="tab-content hidden"><div class="glass p-10 rounded-[3rem] text-center"><input type="date" id="adm-grade-date" class="w-full mb-8" onchange="window.loadAdminGrade()"><div id="admin-hours-grid" class="grid grid-cols-4 gap-3"></div></div></section>
+        <section id="content-grade" class="tab-content hidden text-center"><div class="glass p-10 rounded-[3rem]"><input type="date" id="adm-grade-date" class="w-full mb-8" onchange="window.loadAdminGrade()"><div id="admin-hours-grid" class="grid grid-cols-4 gap-3"></div></div></section>
     </main>
 
     <script type="module">
+        // --- COLOQUE AS CHAVES DO SUPABASE DO SEU CLIENTE AQUI ---
         const _URL = "https://rbhgxrcqqtxnzzyllqms.supabase.co";
         const _KEY = "sb_publishable_OH1hqvBo8vmj_qsvtjKZhQ_QKTg4mLg";
         const supabase = window.supabase.createClient(_URL, _KEY);
@@ -159,27 +160,26 @@
             'modern-violet': { primary: '#7C3AED', bg: '#F5F3FF', text: '#1E1B4B', card: '#FFFFFF' }
         };
 
-        window.setTheme = (themeId) => {
-            const t = THEMES[themeId];
-            const root = document.documentElement;
-            root.style.setProperty('--primary', t.primary);
-            root.style.setProperty('--bg', t.bg);
-            root.style.setProperty('--text', t.text);
-            root.style.setProperty('--card-bg', t.card);
-            window.currentTheme = themeId;
+        window.setTheme = (tId) => {
+            const t = THEMES[tId];
+            document.documentElement.style.setProperty('--primary', t.primary);
+            document.documentElement.style.setProperty('--bg', t.bg);
+            document.documentElement.style.setProperty('--text', t.text);
+            document.documentElement.style.setProperty('--card-bg', t.card);
+            window.currentTheme = tId;
         };
 
-        window.setView = (view) => {
+        window.setView = (v) => {
             document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
-            document.getElementById(`view-${view}`).style.display = 'block';
-            if(view === 'admin') window.loadDash();
+            document.getElementById(`view-${v}`).style.display = 'block';
+            if(v === 'admin') window.loadDash();
         };
 
-        window.showTab = (tab) => {
+        window.showTab = (t) => {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`content-${tab}`).classList.remove('hidden');
-            document.getElementById(`tab-${tab}`).classList.add('active');
+            document.getElementById(`content-${t}`).classList.remove('hidden');
+            document.getElementById(`tab-${t}`).classList.add('active');
         };
 
         window.loadServices = async () => {
@@ -241,7 +241,7 @@
                 data: date, horario: window.selectedHour, valor_total: total
             }]);
             if(!error) {
-                const msg = `💎 *NOVO AGENDAMENTO* 💎\n\nOlá ${studioCfg.nome_studio}! Sou *${name}* e reservei um horário pelo site.\n\n🛠 *Serviços:* ${servsNames}\n📅 *Data:* ${date.split('-').reverse().join('/')}\n⏰ *Horário:* ${window.selectedHour}\n\n_Pode me confirmar?_ ✨`;
+                const msg = `💎 *CONFIRMAÇÃO DE AGENDAMENTO* 💎\n\nOlá ${studioCfg.nome_studio}! Sou *${name}* e agendei pelo site:\n\n🛠 *Serviços:* ${servsNames}\n📅 *Data:* ${date.split('-').reverse().join('/')}\n⏰ *Horário:* ${window.selectedHour}\n📍 *Local:* ${studioCfg.endereco}\n\n_Pode me confirmar?_ ✨🥂`;
                 window.open(`https://wa.me/${studioCfg.whatsapp}?text=${encodeURIComponent(msg)}`);
                 location.reload();
             }
@@ -255,18 +255,18 @@
                 if(a.status === 'Atendido') profit += parseFloat(a.valor_total);
                 if(a.status === 'Bloqueado') return;
                 list.innerHTML += `
-                    <div class="glass p-6 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm">
-                        <div>
+                    <div class="glass p-6 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm border-stone-50">
+                        <div class="text-stone-900">
                             <span class="status-badge ${a.status==='Atendido'?'bg-green-100 text-green-700':'bg-blue-100 text-blue-700'}">${a.status}</span>
                             <h4 class="font-bold text-xl mt-2">${a.cliente_nome}</h4>
                             <p class="text-xs opacity-50 italic">${a.servicos_escolhidos} • ${a.data} • ${a.horario}</p>
                         </div>
                         <div class="flex items-center gap-4">
-                            <span class="font-bold text-xl italic tracking-tighter">R$ ${a.valor_total}</span>
+                            <span class="font-bold text-xl italic tracking-tighter text-stone-900">R$ ${a.valor_total}</span>
                             <div class="flex flex-col gap-1">
                                 <button onclick="window.upStat('${a.id}','Atendido')" class="text-[9px] bg-stone-900 text-white px-4 py-2 rounded-lg font-bold uppercase">Finalizar</button>
                                 <button onclick="window.delBooking('${a.id}')" class="text-[9px] bg-red-100 text-red-600 border border-red-200 px-4 py-2 rounded-lg font-bold uppercase">Apagar</button>
-                                <button onclick="window.sendConfirmRemind('${a.cliente_whatsapp}', '${a.cliente_nome}', '${a.horario}', '${a.servicos_escolhidos}')" class="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-100 px-4 py-2 rounded-lg font-bold uppercase mt-1">Lembrar</button>
+                                <button onclick="window.sendRemind('${a.cliente_whatsapp}', '${a.cliente_nome}', '${a.horario}', '${a.servicos_escolhidos}')" class="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-100 px-4 py-2 rounded-lg font-bold uppercase mt-1">Lembrar</button>
                             </div>
                         </div>
                     </div>`;
@@ -274,7 +274,7 @@
             document.getElementById('stat-profit').innerText = `R$ ${profit.toFixed(2)}`;
         };
 
-        window.sendConfirmRemind = (phone, name, hour, services) => {
+        window.sendRemind = (phone, name, hour, services) => {
             const msg = `💎 *CONFIRMAÇÃO DE ATENDIMENTO* 💎\n\nOlá *${name}*! ✨\nPassando para lembrar que seu momento no *${studioCfg.nome_studio}* está chegando!\n\n⏰ *Horário:* ${hour}\n🛠 *Procedimentos:* ${services}\n📍 *Local:* ${studioCfg.endereco}\n\nPodemos confirmar sua vinda? ✨🥂`;
             window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`);
         };
