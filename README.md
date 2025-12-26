@@ -1,1 +1,1 @@
-# acai
+# studio
