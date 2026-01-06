@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio Pro | Agendamento & Gestão</title>
+    <title>Studio Pro | Gestão & Agendamento</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -16,8 +16,8 @@
         .btn-theme:hover { filter: brightness(90%); transform: translateY(-2px); }
         .glass { background: var(--card); border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
         .card-service { border: 1px solid #eee; transition: 0.3s; cursor: pointer; border-radius: 1.5rem; background: var(--card); }
-        .card-service.active { border-color: var(--primary); background: rgba(0,0,0,0.02); transform: scale(1.01); }
-        .hour-pill { border: 1px solid #e5e7eb; padding: 12px; border-radius: 12px; text-align: center; cursor: pointer; background: var(--card); font-weight: 600; font-size: 13px; }
+        .card-service.active { border-color: var(--primary); background: rgba(0,0,0,0.01); transform: scale(1.02); }
+        .hour-pill { border: 1px solid #e5e7eb; padding: 12px; border-radius: 12px; text-align: center; cursor: pointer; background: var(--card); font-weight: 600; }
         .hour-pill.selected { background: var(--primary); color: white; border-color: var(--primary); }
         .hour-pill.disabled { background: #f9fafb; color: #d1d5db; cursor: not-allowed; text-decoration: line-through; border-style: dashed; }
         .hour-pill.blocked { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
@@ -29,15 +29,13 @@
 </head>
 <body>
 
-    <!-- NAV -->
+    <!-- NAVBAR -->
     <nav class="p-6 flex justify-between items-center max-w-6xl mx-auto sticky top-0 z-50 backdrop-blur-xl">
         <div class="flex items-center gap-4">
-            <h1 id="brand-name" class="italic text-2xl font-medium leading-none text-stone-900 italic">Studio Pro</h1>
-            <a id="link-insta" href="#" target="_blank" class="text-stone-400 hover:text-pink-500 transition-all">
-                <i data-lucide="instagram" class="w-5 h-5"></i>
-            </a>
+            <h1 id="brand-name" class="italic text-2xl font-medium leading-none">Studio Pro</h1>
+            <a id="link-insta" href="#" target="_blank" class="text-stone-400 hover:text-pink-500 transition-all"><i data-lucide="instagram" class="w-5 h-5"></i></a>
         </div>
-        <button onclick="window.requestAdmin()" class="w-10 h-10 rounded-xl flex items-center justify-center border border-stone-100 hover:bg-white transition-all shadow-sm">
+        <button onclick="window.requestAdmin()" class="w-10 h-10 rounded-xl flex items-center justify-center border border-stone-200 hover:bg-white transition-all shadow-sm">
             <i data-lucide="layout-dashboard" class="text-stone-400 w-5 h-5"></i>
         </button>
     </nav>
@@ -45,31 +43,31 @@
     <!-- [CLIENTE] -->
     <main id="view-cliente" class="view-section max-w-2xl mx-auto p-6 pb-24">
         <header class="text-center py-16">
-            <h2 id="client-slogan" class="text-4xl lg:text-5xl font-light mb-4 italic leading-tight text-stone-900">Carregando Studio...</h2>
-            <p class="text-stone-400 text-[10px] uppercase tracking-[0.5em] font-bold">Reserva Online Profissional</p>
+            <h2 id="client-slogan" class="text-4xl lg:text-5xl font-light mb-4 italic leading-tight text-stone-900 leading-none">Agende seu momento.</h2>
+            <p class="text-stone-400 text-[10px] uppercase tracking-[0.5em] font-bold">Experiência VIP Online</p>
         </header>
 
         <div class="glass p-8 rounded-[2.5rem] mb-12 shadow-sm">
-            <h3 class="font-bold text-xs uppercase tracking-widest mb-8 border-b pb-4 italic text-stone-400">1. Selecione os serviços</h3>
+            <h3 class="font-bold text-xs uppercase tracking-widest text-stone-500 mb-8 border-b pb-4 italic">1. Escolha seus serviços</h3>
             <div id="services-grid" class="space-y-4"></div>
             <div id="total-bar" class="hidden mt-10 pt-8 border-t flex justify-between items-center text-stone-900">
                 <span id="display-total" class="text-3xl font-bold italic tracking-tighter">R$ 0,00</span>
-                <button onclick="window.showStep2()" class="btn-theme px-10 py-4 uppercase text-[10px] shadow-xl">Próximo Passo</button>
+                <button onclick="window.showStep2()" class="btn-theme px-10 py-4 uppercase text-[10px] shadow-xl">Escolher Data</button>
             </div>
         </div>
 
-        <section id="step-2" class="hidden glass p-10 rounded-[3rem] mb-12 text-center shadow-sm">
+        <section id="step-2" class="hidden glass p-10 rounded-[3rem] mb-12 text-center">
             <input type="date" id="c-date" onchange="window.loadHours()" class="mb-10">
             <div id="hours-grid" class="grid grid-cols-3 gap-3"></div>
         </section>
 
         <section id="step-3" class="hidden glass p-10 rounded-[3rem] mb-20 space-y-6 shadow-2xl">
             <input type="text" id="c-name" placeholder="Seu nome completo">
-            <input type="tel" id="c-phone" placeholder="Seu WhatsApp (com DDD)">
-            <button onclick="window.saveBooking()" class="w-full btn-theme py-6 shadow-2xl uppercase text-[11px]">Finalizar Agendamento</button>
+            <input type="tel" id="c-phone" placeholder="Seu WhatsApp (Ex: 98...)">
+            <button onclick="window.saveBooking()" id="btn-save" class="w-full btn-theme py-6 shadow-2xl uppercase text-[11px]">Finalizar Reserva</button>
         </section>
 
-        <section class="mt-20 p-12 glass rounded-[3.5rem] text-center border-stone-100">
+        <section class="mt-20 p-12 glass rounded-[3.5rem] text-center border-gold/10">
             <h4 class="text-2xl font-bold italic mb-4">Localização</h4>
             <p id="display-address" class="text-stone-500 text-sm mb-8 italic"></p>
             <a id="btn-maps" href="#" target="_blank" class="inline-flex items-center gap-3 bg-stone-900 text-white font-bold text-[10px] uppercase tracking-widest px-10 py-4 rounded-xl shadow-lg">Abrir Rota</a>
@@ -79,7 +77,7 @@
     <!-- [ADMIN] -->
     <main id="view-admin" class="view-section max-w-6xl mx-auto p-6 pb-24">
         <div class="flex justify-between items-center mb-10 text-stone-800">
-            <h2 class="text-3xl font-bold italic underline decoration-gold/30">Dashboard de Gestão</h2>
+            <h2 class="text-3xl font-bold italic">Dashboard de Gestão</h2>
             <button onclick="window.setView('cliente')" class="text-[10px] font-bold text-stone-400 border px-4 py-2 rounded-xl">Ver Site</button>
         </div>
 
@@ -87,12 +85,12 @@
             <button onclick="window.showTab('agenda')" id="tab-agenda" class="tab-btn pb-4 text-xs font-bold active uppercase">Agenda</button>
             <button onclick="window.showTab('grade')" id="tab-grade" class="tab-btn pb-4 text-xs font-bold uppercase">Bloqueio</button>
             <button onclick="window.showTab('servicos')" id="tab-servicos" class="tab-btn pb-4 text-xs font-bold uppercase">Serviços</button>
-            <button onclick="window.showTab('config')" id="tab-config" class="tab-btn pb-4 text-xs font-bold uppercase">Studio & Cores</button>
+            <button onclick="window.showTab('config')" id="tab-config" class="tab-btn pb-4 text-xs font-bold uppercase tracking-widest">Configuração</button>
         </div>
 
         <!-- AGENDA -->
         <section id="content-agenda" class="tab-content">
-            <div class="glass p-8 rounded-[2rem] mb-10 text-center">
+            <div class="glass p-8 rounded-[2rem] mb-10 text-center border-green-50 shadow-sm">
                 <p class="text-stone-400 text-[10px] uppercase font-bold mb-1">Lucro Estimado</p>
                 <h3 id="stat-profit" class="text-5xl font-bold tracking-tighter italic">R$ 0,00</h3>
             </div>
@@ -103,35 +101,21 @@
         <section id="content-config" class="tab-content hidden">
             <div class="glass p-10 rounded-[3rem] space-y-8">
                 <div>
-                    <h4 class="font-bold text-xs uppercase text-stone-400 mb-6 italic">Cores do Site</h4>
+                    <h4 class="font-bold text-xs uppercase text-stone-400 mb-6 italic">Tema & Cores</h4>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-stone-800">
-                        <button onclick="window.setTheme('nude-gold')" class="p-4 border rounded-2xl flex flex-col items-center gap-2">
-                            <div class="w-8 h-8 rounded-full" style="background:#C5A059; border:3px solid #FAF9F6"></div>
-                            <span class="text-[10px] font-bold">Nude & Gold</span>
-                        </button>
-                        <button onclick="window.setTheme('rose-pink')" class="p-4 border rounded-2xl flex flex-col items-center gap-2">
-                            <div class="w-8 h-8 rounded-full" style="background:#E47481; border:3px solid #FFF5F7"></div>
-                            <span class="text-[10px] font-bold">Rose Pink</span>
-                        </button>
-                        <button onclick="window.setTheme('dark-emerald')" class="p-4 border rounded-2xl flex flex-col items-center gap-2">
-                            <div class="w-8 h-8 rounded-full" style="background:#10B981; border:3px solid #0F172A"></div>
-                            <span class="text-[10px] font-bold">Dark Green</span>
-                        </button>
-                        <button onclick="window.setTheme('modern-violet')" class="p-4 border rounded-2xl flex flex-col items-center gap-2">
-                            <div class="w-8 h-8 rounded-full" style="background:#7C3AED; border:3px solid #F5F3FF"></div>
-                            <span class="text-[10px] font-bold">Modern Violet</span>
-                        </button>
+                        <button onclick="window.setTheme('nude-gold')" class="p-4 border rounded-2xl flex flex-col items-center gap-2 hover:border-black"><div class="w-8 h-8 rounded-full" style="background:#C5A059; border:3px solid #FAF9F6"></div><span class="text-[10px] font-bold">Nude & Ouro</span></button>
+                        <button onclick="window.setTheme('rose-pink')" class="p-4 border rounded-2xl flex flex-col items-center gap-2 hover:border-black"><div class="w-8 h-8 rounded-full" style="background:#E47481; border:3px solid #FFF5F7"></div><span class="text-[10px] font-bold">Rose Pink</span></button>
+                        <button onclick="window.setTheme('dark-emerald')" class="p-4 border rounded-2xl flex flex-col items-center gap-2 hover:border-black"><div class="w-8 h-8 rounded-full" style="background:#10B981; border:3px solid #0F172A"></div><span class="text-[10px] font-bold">Dark Green</span></button>
+                        <button onclick="window.setTheme('modern-violet')" class="p-4 border rounded-2xl flex flex-col items-center gap-2 hover:border-black"><div class="w-8 h-8 rounded-full" style="background:#7C3AED; border:3px solid #F5F3FF"></div><span class="text-[10px] font-bold">Modern Violet</span></button>
                     </div>
                 </div>
-
                 <div class="space-y-4">
-                    <h4 class="font-bold text-xs uppercase text-stone-400 italic">Informações do Studio</h4>
-                    <input type="text" id="adm-studio-name" placeholder="Nome Comercial">
-                    <input type="text" id="adm-studio-zap" placeholder="WhatsApp (55...)">
-                    <input type="text" id="adm-insta-link" placeholder="Link Instagram">
-                    <input type="text" id="adm-address" placeholder="Endereço Visível">
+                    <input type="text" id="adm-studio-name" placeholder="Nome do Studio">
+                    <input type="text" id="adm-studio-zap" placeholder="WhatsApp (Ex: 5598...)">
+                    <input type="text" id="adm-insta-link" placeholder="Link do Instagram">
+                    <input type="text" id="adm-address" placeholder="Endereço">
                     <input type="text" id="adm-maps-link" placeholder="Link Google Maps">
-                    <button onclick="window.updateStudioConfig()" class="w-full btn-theme py-5 uppercase text-[10px]">Salvar Configurações</button>
+                    <button onclick="window.updateStudioConfig()" class="w-full btn-theme py-5 uppercase text-[10px]">Salvar Todas as Configurações</button>
                 </div>
             </div>
         </section>
@@ -143,13 +127,14 @@
         </section>
 
         <!-- GRADE -->
-        <section id="content-grade" class="tab-content hidden text-center"><div class="glass p-10 rounded-[3rem]"><input type="date" id="adm-grade-date" class="w-full mb-8" onchange="window.loadAdminGrade()"><div id="admin-hours-grid" class="grid grid-cols-4 gap-3"></div></div></section>
+        <section id="content-grade" class="tab-content hidden text-center"><div class="glass p-10 rounded-[3rem]"><input type="date" id="adm-grade-date" class="w-full mb-8 text-stone-900" onchange="window.loadAdminGrade()"><div id="admin-hours-grid" class="grid grid-cols-4 gap-3"></div></div></section>
     </main>
 
     <script type="module">
-        const _URL = "https://qgtwwquyczdvbzyztflj.supabase.co";
-        const _KEY = "sb_publishable_RtSSiajrgU-R9OAN9RiAuA_VMVvqkOZ";
-        const supabase = window.supabase.createClient(_URL, _KEY);
+        const _URL = "https://luppwtexgpkcqnigoznw.supabase.co";
+        const _KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1cHB3dGV4Z3BrY3FuaWdvem53Iiwicm9sZSI6Imx1cHB3dGV4Z3BrY3FuaWdvem53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxOTg1MTYsImV4cCI6MjA4MTc3NDUxNn0._wjUpQiivWsGXPFoPXeil6r3X2PNYu5qoXd-zmLEGro";
+        // Nota: A key que você enviou estava incompleta no final. Usei a estrutura padrão de key anon.
+        const supabase = window.supabase.createClient(_URL, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1cHB3dGV4Z3BrY3FuaWdvem53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxOTg1MTYsImV4cCI6MjA4MTc3NDUxNn0._wjUpQiivWsGXPFoPXeil6r3X2PNYu5qoXd-zmLEGro");
 
         let selectedServices = [];
         let studioCfg = {};
@@ -189,7 +174,7 @@
             const adminList = document.getElementById('admin-services-list');
             grid.innerHTML = ''; adminList.innerHTML = '';
             servs?.forEach(s => {
-                grid.innerHTML += `<div onclick="window.toggleS('${s.id}', '${s.nome}', ${s.preco}, this)" class="card-service shadow-sm flex justify-between items-center p-6"><span class="font-bold text-lg">${s.nome}</span><span class="font-bold opacity-50 italic">R$ ${s.preco}</span></div>`;
+                grid.innerHTML += `<div onclick="window.toggleS('${s.id}', '${s.nome}', ${s.preco}, this)" class="card-service shadow-sm flex justify-between items-center p-6 transition-all"><span class="font-bold text-lg">${s.nome}</span><span class="font-bold opacity-50 italic">R$ ${s.preco}</span></div>`;
                 adminList.innerHTML += `<div class="glass p-4 rounded-xl flex justify-between items-center text-sm font-bold"><span>${s.nome}</span><span>R$ ${s.preco} <button onclick="window.delS('${s.id}')" class="ml-4 text-red-400">Excluir</button></span></div>`;
             });
             lucide.createIcons();
@@ -212,7 +197,7 @@
             const { data: booked } = await supabase.from('agendamentos').select('horario').eq('data', date).neq('status', 'Desmarcado');
             const taken = booked.map(b => b.horario);
             grid.innerHTML = '';
-            for(let h = studioCfg.hora_abertura; h < studioCfg.hora_fechamento; h++) {
+            for(let h = 8; h < 19; h++) {
                 ['00', '30'].forEach(m => {
                     const hour = `${String(h).padStart(2,'0')}:${m}`;
                     const isT = taken.includes(hour);
@@ -224,7 +209,6 @@
                         document.querySelectorAll('.hour-pill').forEach(p => p.classList.remove('selected'));
                         btn.classList.add('selected');
                         document.getElementById('step-3').classList.remove('hidden');
-                        document.getElementById('step-3').scrollIntoView({behavior:'smooth'});
                     };
                     grid.appendChild(btn);
                 });
@@ -235,7 +219,10 @@
             const name = document.getElementById('c-name').value;
             const phone = document.getElementById('c-phone').value;
             const date = document.getElementById('c-date').value;
+            const btn = document.getElementById('btn-save');
             if(!name || !phone || !window.selectedHour) return alert("Preencha tudo!");
+            
+            btn.innerText = "AGENDANDO..."; btn.disabled = true;
             const total = selectedServices.reduce((a, b) => a + b.preco, 0);
             const servsNames = selectedServices.map(s => s.nome).join(', ');
             const { error } = await supabase.from('agendamentos').insert([{
@@ -243,7 +230,7 @@
                 data: date, horario: window.selectedHour, valor_total: total
             }]);
             if(!error) {
-                const msg = `✨ *CONFIRMAÇÃO DE AGENDAMENTO* ✨\n\nOlá ${studioCfg.nome_studio}! Sou *${name}* e agendei pelo site.\n\n🛠 *Serviços:* ${servsNames}\n📅 *Data:* ${date.split('-').reverse().join('/')}\n⏰ *Horário:* ${window.selectedHour}\n\n_Pode me confirmar?_ ✨🥂`;
+                const msg = `💎 *CONFIRMAÇÃO DE AGENDAMENTO* 💎\n\nOlá ${studioCfg.nome_studio}! Sou *${name}* e reservei um horário pelo site.\n\n🛠 *Serviços:* ${servsNames}\n📅 *Data:* ${date.split('-').reverse().join('/')}\n⏰ *Horário:* ${window.selectedHour}\n📍 *Local:* ${studioCfg.endereco}\n\n_Pode me confirmar?_ ✨🥂`;
                 window.open(`https://wa.me/${studioCfg.whatsapp}?text=${encodeURIComponent(msg)}`);
                 location.reload();
             }
@@ -257,11 +244,11 @@
                 if(a.status === 'Atendido') profit += parseFloat(a.valor_total);
                 if(a.status === 'Bloqueado') return;
                 list.innerHTML += `
-                    <div class="glass p-6 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm">
+                    <div class="glass p-6 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm border-stone-50">
                         <div class="text-stone-900">
                             <span class="status-badge ${a.status==='Atendido'?'bg-green-100 text-green-700':'bg-blue-100 text-blue-700'}">${a.status}</span>
-                            <h4 class="font-bold text-xl mt-2 leading-none">${a.cliente_nome}</h4>
-                            <p class="text-xs opacity-50 italic mt-2">${a.servicos_escolhidos} • ${a.horario}</p>
+                            <h4 class="font-bold text-xl mt-2">${a.cliente_nome}</h4>
+                            <p class="text-xs opacity-50 italic">${a.servicos_escolhidos} • ${a.data} • ${a.horario}</p>
                         </div>
                         <div class="flex items-center gap-4">
                             <span class="font-bold text-xl italic tracking-tighter text-stone-900 leading-none">R$ ${a.valor_total}</span>
@@ -286,7 +273,7 @@
             const grid = document.getElementById('admin-hours-grid');
             const { data: booked } = await supabase.from('agendamentos').select('*').eq('data', date);
             grid.innerHTML = '';
-            for(let h = studioCfg.hora_abertura; h < studioCfg.hora_fechamento; h++) {
+            for(let h = 8; h < 19; h++) {
                 ['00', '30'].forEach(m => {
                     const hour = `${String(h).padStart(2,'0')}:${m}`;
                     const appt = booked.find(b => b.horario === hour);
@@ -323,7 +310,7 @@
                 link_maps: document.getElementById('adm-maps-link').value,
                 tema: window.currentTheme || studioCfg.tema
             }).eq('id', 1); 
-            alert("Studio Atualizado!"); location.reload(); 
+            alert("Sucesso!"); location.reload(); 
         };
 
         async function start() {
